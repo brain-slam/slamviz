@@ -1,0 +1,2 @@
+# slamviz
+neuroanatomical surface visualization 
