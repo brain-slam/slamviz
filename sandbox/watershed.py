@@ -99,7 +99,7 @@ def watershed(white, vert_area, depthArray, mask, threshDist, threshRidge):
             labels[nind] = lab
             labels_unmerged[nind] = lab
 
-        """
+
         ## Case 3: the node is the neighbor of two or more catchment basins. Then, this node is a ridge point where each pair of basins join.
         # It is assigned to the basin represented by the deepest neighbor vertex, or the lowest label if same depth.
         # Then the conditions for merging two basins are tested (distance between the two pits and ridge height).
@@ -120,30 +120,33 @@ def watershed(white, vert_area, depthArray, mask, threshDist, threshRidge):
                     X += 1
                 else:
                     for label_j in NL[X:]:
-                        if (ridges[label_i][label_j] == 0):
+                        if ridges[label_i][label_j] == 0:
                             # create the ridge point
                             ridges[label_i][label_j] = ridges[label_j][label_i] = nind
                             # compute ridge height
                             ridge_height = abs(pitsAll[label_j][1] - node[1])
 
-                            if (ridge_height < threshRidge):
+                            if ridge_height < threshRidge:
                                 # compute distance between pits
-                                v = aims.vector_FLOAT()  # vector of distances from shallower pit to merge
-                                g.distanceMap_1_N_ind(int(pitsAll[label_i][0]), v, 0)
+                                # v = aims.vector_FLOAT()  # vector of distances from shallower pit to merge
+                                # g.distanceMap_1_N_ind(int(pitsAll[label_i][0]), v, 0)
 
-                                if (v[pitsAll[int(label_j)][0]] < threshDist):
-                                    # print 'merging of', label_j, 'into', label_i
+                                v = geodesics.compute_gdist(white, int(pitsAll[label_i][0]))
+
+                                if v[int(pitsAll[label_j][0])] < threshDist:
+                                    print('merging of', label_j, 'into', label_i)
                                     labels_merged.append(label_j)
                                     pitsRemoved.append(pitsAll[label_j])
                                     labels[np.where(labels == label_j)[0]] = label_i  # update all vertices labels
                                     parent[label_j] = label_i  # assign direct parent label
 
-                                    # Exception: new node has been assigned to a label different from the two that are merging.
-                                    # This leads to a wrong frontier between the two former basins. Solution: re-assign the node to the merged basin.
-                                    if (label_i != lab and label_j != lab):
+                                    # Exception: new node has been assigned to a label different from the two that
+                                    # are merging. This leads to a wrong frontier between the two former basins.
+                                    # Solution: re-assign the node to the merged basin.
+                                    if label_i != lab and label_j != lab:
                                         labels[nind] = label_i
                     X += 1
-        """
+
     ## Results
 
     # parents of unmerged pits : parent[i]=i
