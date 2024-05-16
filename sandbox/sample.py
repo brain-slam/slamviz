@@ -12,11 +12,21 @@ import time
 import watershed
 
 
+def compute_dist(mesh, shortest_path):
+    length = 0
+    for i in range(len(shortest_path) - 1):
+        dx = mesh.vertices[shortest_path[i+1]][0] - mesh.vertices[shortest_path[i]][0]
+        dy = mesh.vertices[shortest_path[i+1]][1] - mesh.vertices[shortest_path[i]][1]
+        dz = mesh.vertices[shortest_path[i+1]][2] - mesh.vertices[shortest_path[i]][2]
+        length += np.sqrt(dx**2 + dy**2 + dz**2)
+    return length
+
+
 def display_watershed(main_path, filename):
     """
     Function that a display a Texture File
 
-    :args: main_path: str to the directory whichs contains the mesh and the tex file
+    :args: main_path: str to the directory which contains the mesh and the tex file
     :args: filename: str of the tex file (which is in the main_path)
     """
     mesh = io.load_mesh(os.path.join(main_path, "mesh.gii"))
@@ -56,7 +66,7 @@ def execution(main_path, side="left", mask_path=None):
     PrincipalCurvatures, PrincipalDir1, PrincipalDir2 = curvature.curvatures_and_derivatives(
         mesh)
     mean_curv = 0.5 * (PrincipalCurvatures[0, :] + PrincipalCurvatures[1, :])
-    curv = texture.TextureND(PrincipalCurvatures)
+    curv = texture.TextureND(mean_curv)
     io.write_texture(curv, os.path.join(path, "curv.gii"))
 
     # Compute the DPF and save it
@@ -68,12 +78,12 @@ def execution(main_path, side="left", mask_path=None):
     # Compute Voronoi vertex and save it
     print("\n\tComputing Voronoi's vertex\n")
     vert_voronoi = vertex_voronoi.vertex_voronoi(mesh)
-    np.save(os.path.join(main_path, "vert_voronoi.npy"), vert_voronoi)
 
     print("\n\tComputing the Fiedler geodesic length and surface area\n")
     mesh_area = np.sum(vert_voronoi)
     (mesh_fiedler_length, field_tex) = differential_geometry.mesh_fiedler_length(mesh, dist_type="geodesic")
-    min_mesh_fiedler_length = min(mesh_fiedler_length)  # ?
+
+    min_mesh_fiedler_length = compute_dist(mesh, mesh_fiedler_length)
 
     thresh_dist = 20
     thresh_ridge = 1.5
@@ -90,6 +100,7 @@ def execution(main_path, side="left", mask_path=None):
     else:
         mask = np.zeros(dpf[0].shape)
 
+    print("\n\tComputing the watershed\n")
     labels_1, pitsKept_1, pitsRemoved_1, ridgePoints, parent_1 = watershed.watershed(
         mesh,
         vert_voronoi,
@@ -128,12 +139,15 @@ def execution(main_path, side="left", mask_path=None):
 
 
 if __name__ == "__main__":
-
     try:
         run = sys.argv[1]
         path = sys.argv[2]
     except IndexError:
         print("Starting error")
+        print("You have to run: ")
+        print("python sample.py exec PATH_TO_MESH SIDE_H MASK_FILENAME")
+        print("or")
+        print("python sample.py display PATH_TO_MESH FILENAME")
         sys.exit()
 
     if run == "exec":
@@ -146,7 +160,12 @@ if __name__ == "__main__":
         execution(path, side, mask)
 
     elif run == "display":
+        """
+        path = "~/Documents/UKBiobank_data/Subj0001/"
+        filename = "labels.gii
+        """
         filename = sys.argv[3]
+
         display_watershed(path, filename)
 
     else:
