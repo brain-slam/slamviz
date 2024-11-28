@@ -6,14 +6,17 @@ sys.path.insert(0, os.path.abspath(os.curdir))
 from .functions import load_mesh, read_gii_file, create_slider_marks, get_colorscale_names
 
 
-def create_layout(mesh_path, texture_path=None):
+def create_layout(mesh_path, texture_paths=None):
     # Charger le mesh
     mesh = load_mesh(mesh_path)
     vertices = mesh.vertices
     faces = mesh.faces
 
     # Charger la texture (si fournie)
-    scalars = read_gii_file(texture_path) if texture_path else None
+    # scalars = read_gii_file(texture_path) if texture_path else None
+    print("before calling: ", texture_paths[0])
+    scalars = read_gii_file(texture_paths[0]) if texture_paths else None
+
 
     # Définir l'intervalle min et max par défaut des scalaires si disponibles
     color_min_default, color_max_default = (np.min(scalars), np.max(scalars)) if scalars is not None else (0, 1)
@@ -21,6 +24,17 @@ def create_layout(mesh_path, texture_path=None):
     layout = html.Div([
         html.H1("Visualisation de maillage 3D avec color bar interactive", style={'textAlign': 'center'}),
         html.Div([
+            html.Label("Sélectionner la texture"),
+            dcc.Dropdown(
+                id='texture-selection-dropdown',
+                options=[{'label': path.split('/')[-1], 'value': path} for path in texture_paths],
+                value=texture_paths[0],
+                clearable=False
+            ),
+        ], style={'display': 'inline-block'}),
+        html.Div([
+
+            # Texture selection dropdown
             html.Div([
                 html.Label("Sélectionner le type de colormap"),
                 dcc.Dropdown(

@@ -23,6 +23,7 @@ def load_mesh(gifti_file):
 
 # Fonction pour lire un fichier GIFTI (scalars.gii)
 def read_gii_file(file_path):
+    print("inside read_gii_file: ", file_path)
     try:
         gifti_img = nib.load(file_path)
         scalars = gifti_img.darrays[0].data

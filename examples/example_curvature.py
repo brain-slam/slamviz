@@ -44,20 +44,26 @@ gaussian_curv = PrincipalCurvatures[0, :] * PrincipalCurvatures[1, :]
 # Comptue mean curvature from principal curvatures
 mean_curv = 0.5 * (PrincipalCurvatures[0, :] + PrincipalCurvatures[1, :])
 
+# Decomposition of the curvatures into ShapeIndex and Curvedness
+shapeIndex, curvedness = scurv.decompose_curvature(PrincipalCurvatures)
+
 
 mean_curv_path = "examples/data/mean_curv.gii"
 gaussian_curv_path = "examples/data/gaussian_curv.gii"
+shape_index_curv_path = "examples/data/shape_index.gii"
 
 tmp_tex = stex.TextureND(mean_curv)
 sio.write_texture(tmp_tex, mean_curv_path)
 
-app.run_dash_app(mesh_file, texture_path=mean_curv_path)
-
-tmp_tex = stex.TextureND(mean_curv)
+tmp_tex = stex.TextureND(gaussian_curv)
 sio.write_texture(tmp_tex, gaussian_curv_path)
 
-app.run_dash_app(mesh_file, texture_path=gaussian_curv_path)
+tmp_tex = stex.TextureND(shapeIndex)
+sio.write_texture(tmp_tex, shape_index_curv_path)
 
+app.run_dash_app(mesh_file, texture_paths=[mean_curv_path, gaussian_curv_path, shape_index_curv_path])
+
+exit()
 
 ###############################################################################
 # Plot mean curvature
