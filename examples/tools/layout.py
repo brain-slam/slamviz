@@ -29,9 +29,17 @@ def create_layout(mesh_path, texture_paths=None):
                 id='texture-selection-dropdown',
                 options=[{'label': path.split('/')[-1], 'value': path} for path in texture_paths],
                 value=texture_paths[0],
-                clearable=False
+                clearable=False,
+                style={
+                    'width': '300px',
+                }
             ),
-        ], style={'display': 'inline-block'}),
+        ], style={
+                'display': 'flex',
+                'flexDirection': 'column',
+                'alignItems': 'center',
+                'justifyContent': 'center',
+            }),
         html.Div([
 
             # Texture selection dropdown
