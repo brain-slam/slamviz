@@ -23,11 +23,20 @@ import numpy as np
 import slam.io as sio
 import slam.curvature as scurv
 import slam.spangy as spgy
+import slam.texture as stex
+import matplotlib.pyplot as plt
+
+# importation for the viz
+import sys, os
+
+sys.path.insert(0, os.path.abspath(os.curdir))
+from tools import app
+
 
 ###############################################################################
 # LOAD MESH
-mesh = sio.load_mesh(
-    '../examples/data/example_mesh.gii')
+mesh_file = 'examples/data/example_mesh.gii'
+mesh = sio.load_mesh(mesh_file)
 vertices = mesh.vertices
 num_vertices = len(vertices)
 print('{} vertices'.format(num_vertices))
@@ -36,10 +45,12 @@ N = 1500  # N should be < to the number of vertices.
 
 ###############################################################################
 # Compute eigenpairs and mass matrix
+print("compute the eigen vectors and eigen values")
 eigVal, eigVects, lap_b = spgy.eigenpairs(mesh, N)
 
 ###############################################################################
 # CURVATURE
+print("compute the mean curvature")
 PrincipalCurvatures, PrincipalDir1, PrincipalDir2 = \
     scurv.curvatures_and_derivatives(mesh)
 mean_curv = 0.5 * (PrincipalCurvatures[0, :] + PrincipalCurvatures[1, :])
@@ -49,6 +60,26 @@ mean_curv = 0.5 * (PrincipalCurvatures[0, :] + PrincipalCurvatures[1, :])
 grouped_spectrum, group_indices, coefficients, nlevels \
     = spgy.spectrum(mean_curv, lap_b, eigVects, eigVal)
 levels = len(group_indices)
+
+# Plot coefficients and bands for all mean curvature signal
+fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
+frequency = np.sqrt(eigVal/2*np.pi, ) # from equations in Appendix A.1
+ax1.scatter(frequency,
+coefficients, marker='o', s=20, linewidths=0.5)
+ax1.set_xlabel('Frequency (m⁻¹)')
+ax1.set_ylabel('Coefficients')
+
+ax2.scatter(frequency[1:],
+coefficients[1:], marker='o', s=20, linewidths=0.5) # remove B0 coefficients
+ax2.set_xlabel('Frequency (m⁻¹)')
+ax2.set_ylabel('Coefficients')
+
+# print(grouped_spectrum)
+ax3.bar(np.arange(0, levels), grouped_spectrum)
+ax3.set_xlabel('Spangy Frequency Bands')
+ax3.set_ylabel('Power Spectrum')
+plt.show()
+
 
 # a. Whole brain parameters
 mL_in_MM3 = 1000
@@ -82,6 +113,20 @@ loc_dom_band, frecomposed = spgy.local_dominance_map(coefficients, mean_curv,
                                                      levels, group_indices,
                                                      eigVects)
 
+tex_path = "examples/data/spangy_dom_band.gii"
+tmp_tex = stex.TextureND(loc_dom_band)
+sio.write_texture(tmp_tex, tex_path)
+
+###############################################################################
+# run the visualization app
+app.run_dash_app(mesh_file, texture_paths=[tex_path])
+
+exit()
+# # Plot of spectral dominant bands on the mesh
+# visb_sc = splt.visbrain_plot(mesh=mesh, tex=loc_dom_band,
+#                              caption='Local Dominant Band', cmap='jet')
+# visb_sc.preview()
+#
 
 # WHOLE BRAIN MEAN-CURVATURE<=0 & MEAN-CURVATURE>0 SPECTRI
 # --------------------------------------------------------
@@ -101,42 +146,13 @@ grouped_spectrum_gyri, group_indices_gyri, coefficients_gyri, _ \
 # VISUALIZATION USING EXTERNAL TOOLS
 #############################################################################
 # import slam.plot as splt
-# import matplotlib.pyplot as plt
+#
 # from matplotlib.colors import ListedColormap
 # import pyvista as pv
 #
-# ###############################################################################
-# # Plot of mean curvature on the mesh
-# visb_sc = splt.visbrain_plot(
-#     mesh=mesh,
-#     tex=mean_curv,
-#     caption='Mean Curvature',
-#     cmap='jet')
-# visb_sc.preview()
+
 #
-# # Plot coefficients and bands for all mean curvature signal
-# fig, (ax1, ax2) = plt.subplots(1, 2)
-# ax1.scatter(np.sqrt(eigVal/2*np.pi),
-# coefficients, marker='+', s=10, linewidths=0.5)
-# #ax1.plot(np.sqrt(eigVal[1:]) / (2 * np.pi),
-# # coefficients[1:]) # remove B0 coefficients
-# #ax1.scatter(np.sqrt(eigVal[1:]/2*np.pi),
-# # coefficients[1:], marker='+', s=10, linewidths=0.5) # remove B0 coefficients
-# ax1.set_xlabel('Frequency (m⁻¹)')
-# ax1.set_ylabel('Coefficients')
-#
-# # print(grouped_spectrum)
-# ax2.bar(np.arange(0, levels), grouped_spectrum)
-# #ax2.bar(np.arange(1, nlevels), grouped_spectrum[1:]) # remove B0
-# ax2.set_xlabel('Spangy Frequency Bands')
-# ax2.set_ylabel('Power Spectrum')
-# plt.show()
-#
-# # Plot of spectral dominant bands on the mesh
-# visb_sc = splt.visbrain_plot(mesh=mesh, tex=loc_dom_band,
-#                              caption='Local Dominant Band', cmap='jet')
-# visb_sc.preview()
-#
+
 # # Plot mean curvature coefficients & compacted power spectrum characterizing
 # # either Sulci either Gyri folding pattern
 # # ---------------------------------------------------------------------------
