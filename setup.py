@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-BASE_REQUIREMENTS = ["brain-slam", "visbrain"]
+BASE_REQUIREMENTS = ["brain-slam", "dash", "plotly", "nibabel", "numpy", "scipy", "trimesh"]
 TEST_REQUIREMENTS = ["flake8", "autopep8", "pytest", "pytest-cov", "coveralls"]
 
 setup(
