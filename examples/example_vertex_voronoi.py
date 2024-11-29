@@ -23,6 +23,8 @@ import numpy as np
 import trimesh
 
 # importation for the viz
+import sys, os
+sys.path.insert(0, os.path.abspath(os.curdir))
 from tools import app
 
 ###############################################################################
