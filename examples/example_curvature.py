@@ -25,12 +25,14 @@ sys.path.insert(0, os.path.abspath(os.curdir))
 from tools import app
 
 ###############################################################################
-# loading an examplar mesh
+# load and reorient an examplar mesh
 mesh_file = 'examples/data/example_mesh.gii'
 mesh = sio.load_mesh(mesh_file)
+print(mesh.principal_inertia_transform)
+mesh.apply_transform(mesh.principal_inertia_transform)
+print(mesh.principal_inertia_transform)
 
 ###############################################################################
-
 # Comptue estimations of principal curvatures
 PrincipalCurvatures, PrincipalDir1, PrincipalDir2 = \
     scurv.curvatures_and_derivatives(mesh)
@@ -43,46 +45,6 @@ gaussian_curv = PrincipalCurvatures[0, :] * PrincipalCurvatures[1, :]
 # Comptue mean curvature from principal curvatures
 mean_curv = 0.5 * (PrincipalCurvatures[0, :] + PrincipalCurvatures[1, :])
 
-# Decomposition of the curvatures into ShapeIndex and Curvedness
-shapeIndex, curvedness = scurv.decompose_curvature(PrincipalCurvatures)
-
-
-mean_curv_path = "examples/data/mean_curv.gii"
-gaussian_curv_path = "examples/data/gaussian_curv.gii"
-shape_index_curv_path = "examples/data/shape_index.gii"
-
-tmp_tex = stex.TextureND(mean_curv)
-sio.write_texture(tmp_tex, mean_curv_path)
-
-tmp_tex = stex.TextureND(gaussian_curv)
-sio.write_texture(tmp_tex, gaussian_curv_path)
-
-tmp_tex = stex.TextureND(shapeIndex)
-sio.write_texture(tmp_tex, shape_index_curv_path)
-
-# [mean_curv_path, gaussian_curv_path, shape_index_curv_path]
-app.run_dash_app(mesh_file, texture_paths=[mean_curv_path, gaussian_curv_path, shape_index_curv_path])
-
-exit()
-
-###############################################################################
-# Plot mean curvature
-
-'''
-visb_sc = splt.visbrain_plot(mesh=mesh, tex=mean_curv,
-                             caption='mean curvature',
-                             cblabel='mean curvature')
-visb_sc.preview()
-'''
-
-###############################################################################
-# Plot Gauss curvature
-visb_sc = splt.visbrain_plot(mesh=mesh, tex=gaussian_curv,
-                             caption='Gaussian curvature',
-                             cblabel='Gaussian curvature',
-                             cmap='hot')
-visb_sc.preview()
-
 ###############################################################################
 # Decomposition of the curvatures into ShapeIndex and Curvedness
 # Based on 'Surface shape and curvature scales
@@ -90,18 +52,23 @@ visb_sc.preview()
 shapeIndex, curvedness = scurv.decompose_curvature(PrincipalCurvatures)
 
 ###############################################################################
-# Plot of ShapeIndex and Curvedness
-visb_sc = splt.visbrain_plot(mesh=mesh, tex=shapeIndex,
-                             caption='ShapeIndex',
-                             cblabel='ShapeIndex',
-                             cmap='coolwarm')
-visb_sc.preview()
+# save the computed maps on the disc
+mean_curv_path = "examples/data/mean_curv.gii"
+gaussian_curv_path = "examples/data/gaussian_curv.gii"
+shape_index_curv_path = "examples/data/shape_index.gii"
+tmp_tex = stex.TextureND(mean_curv)
+sio.write_texture(tmp_tex, mean_curv_path)
+tmp_tex = stex.TextureND(gaussian_curv)
+sio.write_texture(tmp_tex, gaussian_curv_path)
+tmp_tex = stex.TextureND(shapeIndex)
+sio.write_texture(tmp_tex, shape_index_curv_path)
 
-visb_sc = splt.visbrain_plot(mesh=mesh, tex=curvedness,
-                             caption='Curvedness',
-                             cblabel='Curvedness',
-                             cmap='hot')
-visb_sc.preview()
+###############################################################################
+# run the visualization app
+app.run_dash_app(mesh_file, texture_paths=[mean_curv_path, gaussian_curv_path, shape_index_curv_path])
+
+exit()
+
 
 
 ###############################################################################
