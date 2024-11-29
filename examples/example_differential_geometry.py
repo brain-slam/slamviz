@@ -16,7 +16,8 @@ example of differential geometry tools in slam
 # importation of slam modules
 import slam.io as sio
 import slam.differential_geometry as sdg
-import slam.plot as splt
+# import slam.plot as splt
+from tools import 
 
 ###############################################################################
 # loading an examplar mesh and corresponding texture and show it
@@ -25,10 +26,11 @@ texture_file = '../examples/data/example_texture.gii'
 mesh = sio.load_mesh(mesh_file)
 tex = sio.load_texture(texture_file)
 
-visb_sc = splt.visbrain_plot(mesh=mesh, tex=tex.darray[0],
-                             caption='mesh with curvature',
-                             cblabel='curvature')
-visb_sc.preview()
+# Use from app run_app_dash
+# visb_sc = splt.visbrain_plot(mesh=mesh, tex=tex.darray[0],
+#                              caption='mesh with curvature',
+#                              cblabel='curvature')
+# visb_sc.preview()
 
 ###############################################################################
 # compute various types of Laplacian of the mesh
