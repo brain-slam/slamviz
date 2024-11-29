@@ -1,4 +1,4 @@
-"""
+"""test
 .. _example_curvature:
 
 ===================================
@@ -19,15 +19,20 @@ import slam.utils as ut
 import numpy as np
 import slam.generate_parametric_surfaces as sgps
 import slam.io as sio
-import slam.plot as splt
+import slam.texture as stex
 import slam.curvature as scurv
+
+# importation for the viz
+import tempfile
+from tools import app
 
 ###############################################################################
 # loading an examplar mesh
-mesh_file = '../examples/data/example_mesh.gii'
+mesh_file = 'examples/data/example_mesh.gii'
 mesh = sio.load_mesh(mesh_file)
 
 ###############################################################################
+
 # Comptue estimations of principal curvatures
 PrincipalCurvatures, PrincipalDir1, PrincipalDir2 = \
     scurv.curvatures_and_derivatives(mesh)
@@ -40,12 +45,37 @@ gaussian_curv = PrincipalCurvatures[0, :] * PrincipalCurvatures[1, :]
 # Comptue mean curvature from principal curvatures
 mean_curv = 0.5 * (PrincipalCurvatures[0, :] + PrincipalCurvatures[1, :])
 
+# Decomposition of the curvatures into ShapeIndex and Curvedness
+shapeIndex, curvedness = scurv.decompose_curvature(PrincipalCurvatures)
+
+
+mean_curv_path = "examples/data/mean_curv.gii"
+gaussian_curv_path = "examples/data/gaussian_curv.gii"
+shape_index_curv_path = "examples/data/shape_index.gii"
+
+tmp_tex = stex.TextureND(mean_curv)
+sio.write_texture(tmp_tex, mean_curv_path)
+
+tmp_tex = stex.TextureND(gaussian_curv)
+sio.write_texture(tmp_tex, gaussian_curv_path)
+
+tmp_tex = stex.TextureND(shapeIndex)
+sio.write_texture(tmp_tex, shape_index_curv_path)
+
+# [mean_curv_path, gaussian_curv_path, shape_index_curv_path]
+app.run_dash_app(mesh_file, texture_paths=[mean_curv_path, gaussian_curv_path, shape_index_curv_path])
+
+exit()
+
 ###############################################################################
 # Plot mean curvature
+
+'''
 visb_sc = splt.visbrain_plot(mesh=mesh, tex=mean_curv,
                              caption='mean curvature',
                              cblabel='mean curvature')
 visb_sc.preview()
+'''
 
 ###############################################################################
 # Plot Gauss curvature
