@@ -30,7 +30,6 @@ def read_gii_file(file_path):
         scalars = gifti_img.darrays[0].data
         return scalars
     except Exception as e:
-        print(file_path)
         print(f"Erreur lors du chargement de la texture : {e}")
         return None
 

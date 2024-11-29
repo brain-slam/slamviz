@@ -18,6 +18,8 @@ import slam.io as sio
 import slam.differential_geometry as sdg
 import slam.texture as stex
 from tools import app
+# import slam.plot as splt
+from tools import 
 
 ###############################################################################
 # loading an examplar mesh and corresponding texture and show it
@@ -31,11 +33,11 @@ dpf_path = 'examples/data/dpf.gii'
 mesh = sio.load_mesh(mesh_file)
 tex = sio.load_texture(texture_file)
 
+# Use from app run_app_dash
 # visb_sc = splt.visbrain_plot(mesh=mesh, tex=tex.darray[0],
 #                              caption='mesh with curvature',
 #                              cblabel='curvature')
 # visb_sc.preview()
-
 
 ###############################################################################
 # compute various types of Laplacian of the mesh
@@ -83,4 +85,4 @@ sio.write_texture(dpf_tex, dpf_path)
 #                              caption='depth potential function',
 #                              cblabel='dpf')
 # visb_sc.preview()
-# app.run_dash_app(mesh_file, texture_paths=[dpf_path, norm_grad_path, texture_file])
+app.run_dash_app(mesh_file, texture_paths=[dpf_path, norm_grad_path, texture_file])

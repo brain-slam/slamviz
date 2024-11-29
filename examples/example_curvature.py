@@ -15,15 +15,13 @@ example of curvature estimation in slam
 
 ###############################################################################
 # importation of slam modules
-import slam.utils as ut
-import numpy as np
-import slam.generate_parametric_surfaces as sgps
 import slam.io as sio
 import slam.texture as stex
 import slam.curvature as scurv
 
 # importation for the viz
-import tempfile
+import sys, os
+sys.path.insert(0, os.path.abspath(os.curdir))
 from tools import app
 
 ###############################################################################
