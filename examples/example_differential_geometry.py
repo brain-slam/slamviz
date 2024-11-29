@@ -19,7 +19,6 @@ import slam.differential_geometry as sdg
 import slam.texture as stex
 from tools import app
 # import slam.plot as splt
-from tools import 
 
 ###############################################################################
 # loading an examplar mesh and corresponding texture and show it
