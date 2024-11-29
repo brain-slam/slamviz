@@ -11,6 +11,8 @@ def load_mesh(gifti_file):
     :param gifti_file: str, path to the gifti file on the disk
     :return: the corresponding trimesh object
     """
+    if gifti_file is None:
+        return None
     g = nib.load(gifti_file)
     coords, faces = g.get_arrays_from_intent(
         nib.nifti1.intent_codes['NIFTI_INTENT_POINTSET'])[0].data, \
@@ -23,12 +25,12 @@ def load_mesh(gifti_file):
 
 # Fonction pour lire un fichier GIFTI (scalars.gii)
 def read_gii_file(file_path):
-    print("inside read_gii_file: ", file_path)
     try:
         gifti_img = nib.load(file_path)
         scalars = gifti_img.darrays[0].data
         return scalars
     except Exception as e:
+        print(file_path)
         print(f"Erreur lors du chargement de la texture : {e}")
         return None
 

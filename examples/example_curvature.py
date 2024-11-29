@@ -32,6 +32,7 @@ mesh_file = 'examples/data/example_mesh.gii'
 mesh = sio.load_mesh(mesh_file)
 
 ###############################################################################
+
 # Comptue estimations of principal curvatures
 PrincipalCurvatures, PrincipalDir1, PrincipalDir2 = \
     scurv.curvatures_and_derivatives(mesh)
@@ -61,6 +62,7 @@ sio.write_texture(tmp_tex, gaussian_curv_path)
 tmp_tex = stex.TextureND(shapeIndex)
 sio.write_texture(tmp_tex, shape_index_curv_path)
 
+# [mean_curv_path, gaussian_curv_path, shape_index_curv_path]
 app.run_dash_app(mesh_file, texture_paths=[mean_curv_path, gaussian_curv_path, shape_index_curv_path])
 
 exit()

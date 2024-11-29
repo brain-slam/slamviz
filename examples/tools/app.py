@@ -3,8 +3,9 @@ import argparse
 from .layout import create_layout
 from .callbacks import register_callbacks
 
+
 # Fonction principale pour exécuter l'application
-def run_dash_app(mesh_path, texture_paths=None):
+def run_dash_app(mesh_path, texture_paths=None, port=8050):
     # Créer l'application Dash
     app = dash.Dash(__name__)
 
@@ -15,5 +16,6 @@ def run_dash_app(mesh_path, texture_paths=None):
     register_callbacks(app, mesh_path, texture_paths)
 
     # Lancer l'application
-    app.run_server(debug=True)
+    app.run_server(debug=True, port=port)
+
 
