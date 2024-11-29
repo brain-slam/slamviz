@@ -65,7 +65,7 @@ sio.write_texture(tmp_tex, shape_index_curv_path)
 
 ###############################################################################
 # run the visualization app
-app.run_dash_app(mesh_file, texture_paths=[mean_curv_path, gaussian_curv_path, shape_index_curv_path])
+app.run_dash_app(mesh_path=mesh_file, texture_paths=[mean_curv_path, gaussian_curv_path, shape_index_curv_path])
 
 exit()
 
